@@ -16,7 +16,7 @@ class _LogoDisplayState extends State<LogoDisplay> {
   }
 
   void goToLandingPage() {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => MainScreen()),
     );

@@ -28,7 +28,7 @@ class SchoolLocation {
 }
 
 class SchoolInformationSheet extends StatefulWidget {
-  final SchoolLocation school;
+  final SchoolLocation? school;
 
   const SchoolInformationSheet({required this.school, super.key});
 
@@ -44,6 +44,12 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
   void initState() {
     super.initState();
     _controller.addListener(_onChanged);
+
+    if (widget.school != null) {
+      _expand();
+    } else {
+      _hide();
+    }
   }
 
   void _onChanged() {
@@ -87,6 +93,7 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
               expand: true,
               snap: true,
               snapSizes: [
+                0,
                 60 / constraints.maxHeight,
                 0.5,
               ],
@@ -113,14 +120,14 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                       SliverToBoxAdapter(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Icon(Icons.drag_handle),
                           ],
                         ),
                       ),
-                      SliverToBoxAdapter(
+                      if (widget.school != null) SliverToBoxAdapter(
                         child: Text(
-                          widget.school.name,
+                          widget.school?.name ?? '',
                           style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold),
@@ -131,7 +138,7 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                       //     shrinkWrap: true,
                       //     scrollDirection: Axis.horizontal,
                       //     children: [
-                            // // horizontal grid with 1 picture and 4 picture remaining
+                            // horizontal grid with 1 picture and 4 picture remaining
                             // StaggeredGrid.count(
                             //   axisDirection: AxisDirection.right,
                             //   crossAxisCount: 4,
@@ -191,7 +198,7 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                       //     ],
                       //   ),
                       // ),
-                      SliverList(
+                      if (widget.school != null) SliverList(
                         delegate: SliverChildListDelegate([
                           Container(
                             height: MediaQuery.of(context).size.height * 0.5,
@@ -204,9 +211,9 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20)),
-                                widget.school.offeredPrograms.isNotEmpty
+                                 widget.school!.offeredPrograms.isNotEmpty
                                     ? HtmlWidget(
-                                        widget.school.offeredPrograms,
+                                        widget.school!.offeredPrograms,
                                       )
                                     : const Text('No programs offered'),
                               ],
@@ -344,13 +351,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         ],
       ),
       
-      SchoolInformationSheet(
-          school: schools.isNotEmpty
-              ? schools.first
-              : SchoolLocation(
-                  name: 'No school',
-                  location: LatLng(0, 0),
-                  offeredPrograms: ''))
+      // SchoolInformationSheet(school: schools.isNotEmpty ? schools.first : null),
     ]));
   }
 }

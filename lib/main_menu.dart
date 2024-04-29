@@ -12,7 +12,6 @@ class CarouselItem {
   final String body;
 
   const CarouselItem({required this.title, required this.body});
-
 }
 
 class MenuItem {
@@ -55,6 +54,18 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
   final List<MenuItem> menuItems = [
+    MenuItem(
+      title: 'Map',
+      icon: Icons.map,
+      description: 'View the map',
+      onTap: (context) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return MapScreen();
+        }));
+      },
+    ),
+
+    final List<MenuItem> menuItems = [
     MenuItem(
       title: 'Map',
       icon: Icons.map,
@@ -109,177 +120,259 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
 
+
   String _selectedOption = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text('CHED REGION XI'),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-          },
+      drawer: Drawer(
+      child: Container(
+        color: Color(0xFF252872),
+        child: ListView(
+          children: [
+            DrawerHeader(
+              child: Row(
+                children: [
+                  Icon(
+                    FontAwesomeIcons.facebook,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 20),
+                  Icon(
+                    FontAwesomeIcons.twitter,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 20),
+                  Icon(
+                    FontAwesomeIcons.instagram,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 20),
+                  Icon(
+                    FontAwesomeIcons.youtube,
+                    color: Colors.white,
+                  ),
+                  SizedBox(width: 20),
+                  Icon(
+                    FontAwesomeIcons.yahoo,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            for (var i = 0; i < menuItems.length; i++)
+              ListTile(
+                title: Text(
+                  menuItems[i].title,
+                  style: TextStyle(color: Colors.white),
+                ),
+                leading: Icon(
+                  menuItems[i].icon,
+                  color: Color(0xFF252872),
+                ),
+                onTap: () {
+                  if (menuItems[i].onTap != null) {
+                    menuItems[i].onTap!(context);
+                  } else {
+                    // launch the URL
+                  }
+
+                  Navigator.pop(context);
+
+                  if (i == 0) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                          return MapScreen();
+                        }));
+                  }
+                },
+              ),
+          ],
         ),
       ),
-      drawer: Drawer(
-        child: Container(
-          color: Color(0xFF252872),
-          child: ListView(
+    ),
+      body: Stack(
+        children: [
+          Column(
             children: [
-              DrawerHeader(
-                child: Row(
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.facebook,
-                      color: Colors.white,
+              CarouselSlider(
+                items: carouselItems.map(
+                  (item) => Container(
+                    height: 200,
+                    width: 500,
+                    margin: EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF252872),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    SizedBox(width: 20),
-                    Icon(
-                      FontAwesomeIcons.twitter,
-                      color: Colors.white,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) {
+                          return ArticleScreen();
+                        }));
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            item.title,
+                            style: TextStyle(fontSize: 24, color: Colors.white),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            item.body.substring(0, min(100, item.body.length)) + ( item.body.length > 100 ? '... See more' : '' ),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(width: 20),
-                    Icon(
-                      FontAwesomeIcons.instagram,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 20),
-                    Icon(
-                      FontAwesomeIcons.youtube,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 20),
-                    Icon(
-                      FontAwesomeIcons.yahoo,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
+                  ),
+                ).toList(),
+                options: CarouselOptions(
+                  height: 200.0,
+                  autoPlay: true,
+                  enlargeCenterPage: true,
+                  aspectRatio: 16 / 9,
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enableInfiniteScroll: true,
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  viewportFraction: 0.8,
                 ),
               ),
-              for (var i = 0; i < menuItems.length; i++)
-                ListTile(
-                  title: Text(
-                    menuItems[i].title,
-                    style: TextStyle(color: Colors.white),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
                   ),
-                  leading: Icon(
-                    menuItems[i].icon,
-                    color: Color(0xFF252872),
-                  ),
-                  onTap: () {
-                    if (menuItems[i].onTap != null) {
-                      menuItems[i].onTap!(context);
+                  itemCount: menuItems.length,
+                  itemBuilder: (context, index) {
+                    if (index < menuItems.length) {
+                      return InkWell(
+                        onLongPress: () {
+                          _showIconDetails(context, menuItems[index]);
+                        },
+                        onTap: () {
+                          if (menuItems[index].onTap != null) {
+                            menuItems[index].onTap!(context);
+                          } else {
+                            // launch the URL
+                          }
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(menuItems[index].icon,
+                                size: 50, color: Color(0xFF252872)),
+                            SizedBox(height: 10),
+                            Text(
+                              menuItems[index].title,
+                              style: TextStyle(color: Color(0xFF252872)),
+                            ),
+                          ],
+                        ),
+                      );
                     } else {
-                      // launch the URL
-                    }
-
-                    Navigator.pop(context);
-
-                    if (i == 0) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return MapScreen();
-                      }));
+                      return Container();
                     }
                   },
                 ),
+              ),
             ],
           ),
-        ),
-      ),
-      body: Column(
-        children: [
-          CarouselSlider(
-            items: carouselItems.map(
-              (item) => Container(
-                height: 200, // Set the height of the container
-                width: 500,
-                margin: EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                  color: Color(0xFF252872),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return ArticleScreen();
-                    }));
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        item.title,
-                        style: TextStyle(fontSize: 24, color: Colors.white),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        item.body.substring(0, min(100, item.body.length)) + ( item.body.length > 100 ? '... See more' : '' ),
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ],
-                  )
-                ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(10),
               ),
-            ).toList(),
-            options: CarouselOptions(
-              height: 200.0,
-              autoPlay: true,
-              enlargeCenterPage: true,
-              aspectRatio: 16 / 9,
-              autoPlayCurve: Curves.fastOutSlowIn,
-              enableInfiniteScroll: true,
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              viewportFraction: 0.8,
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-              ),
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                if (index < menuItems.length) {
-                  return InkWell(
-                    onLongPress: () {
-                      _showIconDetails(context, menuItems[index]);
-                    },
-                    onTap: () {
-                      if (menuItems[index].onTap != null) {
-                        menuItems[index].onTap!(context);
-                      } else {
-                        // launch the URL
-                      }
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(menuItems[index].icon,
-                            size: 50, color: Color(0xFF252872)),
-                        SizedBox(height: 10),
-                        Text(
-                          menuItems[index].title,
-                          style: TextStyle(color: Color(0xFF252872)),
-                        ),
-                      ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'FAQs',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF252872),
                     ),
-                  );
-                } else {
-                  return Container();
-                }
-              },
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Q: What is Lorem Ipsum? \nA: Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF252872),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextButton(
+                    onPressed: () {
+                      // Handle FAQ button tap
+                    },
+                    child: Text(
+                      'More FAQs',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Color(0xFF252872),
+      items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'Map',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.article),
+          label: 'News',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.question_answer),
+          label: 'FAQs',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.group),
+          label: 'Socials',
+        ),
+      ],
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.white.withOpacity(0.5),
+      currentIndex: 0,
+      onTap: (idx) {
+        if (idx == 1) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return MapScreen();
+          }));
+        }
+      },
+    ),
     );
   }
 
@@ -303,9 +396,10 @@ class _MainScreenState extends State<MainScreen> {
                 Text(
                   menuItem.title,
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF252872)),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF252872),
+                  ),
                 ),
                 SizedBox(height: 10),
                 Text(
