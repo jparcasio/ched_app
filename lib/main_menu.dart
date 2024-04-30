@@ -6,6 +6,85 @@ import 'package:chedapplication/pocketbase.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chedapplication/map.dart';
+import 'package:pocketbase/pocketbase.dart';
+
+class LatestFAQItem extends StatefulWidget {
+  const LatestFAQItem();
+
+  @override
+  State<LatestFAQItem> createState() => _LatestFAQItemState();
+}
+
+class _LatestFAQItemState extends State<LatestFAQItem> {
+  Future<RecordModel> _loadData() async {
+    final result = await pb.collection('faqs').getList(perPage: 1, skipTotal: false, sort: 'created');
+    if (result.items.isEmpty) {
+      throw Exception('No FAQs found.');
+    }
+    return result.items.first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(future: _loadData(), builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const CircularProgressIndicator();
+      }
+
+      return Container(
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 10
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              spreadRadius: 3,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'FAQs',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF252872),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              snapshot.hasData ? 'Q: ${snapshot.data?.data['question']}' : snapshot.error.toString(),                     
+                style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF252872),
+              ),
+            ),
+            SizedBox(height: 1),
+            TextButton(
+              onPressed: () {
+                // TODO: Handle FAQ button tap
+              },
+              child: const Text(
+                'More FAQs',
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
 
 class CarouselItem {
   final String title;
@@ -31,7 +110,7 @@ class MenuItem {
 
 class MainScreen extends StatefulWidget {
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
@@ -53,18 +132,6 @@ class _MainScreenState extends State<MainScreen> {
       body: 'Body 3',
     ),
   ];
-  final List<MenuItem> menuItems = [
-    MenuItem(
-      title: 'Map',
-      icon: Icons.map,
-      description: 'View the map',
-      onTap: (context) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return MapScreen();
-        }));
-      },
-    ),
-
     final List<MenuItem> menuItems = [
     MenuItem(
       title: 'Map',
@@ -197,57 +264,66 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     ),
-      body: Stack(
+      body: SafeArea(child: Stack(
+        alignment: Alignment.topCenter,
         children: [
-          Column(
-            children: [
-              CarouselSlider(
-                items: carouselItems.map(
-                  (item) => Container(
-                    height: 200,
-                    width: 500,
-                    margin: EdgeInsets.all(3.0),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF252872),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) {
-                          return ArticleScreen();
-                        }));
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            item.title,
-                            style: TextStyle(fontSize: 24, color: Colors.white),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            item.body.substring(0, min(100, item.body.length)) + ( item.body.length > 100 ? '... See more' : '' ),
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ],
+          // Expanded(child: Image.asset('images/bg.fluts.png', fit: BoxFit.cover)),
+          CustomPaint(
+            size: Size(MediaQuery.of(context).size.width, 100),
+            painter: BgPainter(color: Color(0xFF32A2EA)),
+          ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 150),
+                CarouselSlider(
+                  items: carouselItems.map(
+                    (item) => Container(
+                      height: 100,
+                      width: 600,
+                      margin: EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF252872),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                    ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            return ArticleScreen();
+                          }));
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              item.title,
+                              style: TextStyle(fontSize: 24, color: Colors.white),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              item.body.substring(0, min(100, item.body.length)) + ( item.body.length > 100 ? '... See more' : '' ),
+                              style: TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ).toList(),
+                  options: CarouselOptions(
+                    height: 150.0,
+                    autoPlay: true,
+                    enlargeCenterPage: true,
+                    aspectRatio: 16 / 9,
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enableInfiniteScroll: true,
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    viewportFraction: 0.8,
                   ),
-                ).toList(),
-                options: CarouselOptions(
-                  height: 200.0,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  aspectRatio: 16 / 9,
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: true,
-                  autoPlayAnimationDuration: Duration(milliseconds: 800),
-                  viewportFraction: 0.8,
                 ),
-              ),
-              Expanded(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                   ),
                   itemCount: menuItems.length,
@@ -268,7 +344,7 @@ class _MainScreenState extends State<MainScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(menuItems[index].icon,
-                                size: 50, color: Color(0xFF252872)),
+                                size: 70, color: Color(0xFF252872)),
                             SizedBox(height: 10),
                             Text(
                               menuItems[index].title,
@@ -281,62 +357,13 @@ class _MainScreenState extends State<MainScreen> {
                       return Container();
                     }
                   },
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 3,
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'FAQs',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF252872),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Q: What is Lorem Ipsum? \nA: Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF252872),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {
-                      // Handle FAQ button tap
-                    },
-                    child: Text(
-                      'More FAQs',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ),
-                ],
-              ),
+                )
+              ],
             ),
           ),
+          LatestFAQItem()
         ],
-      ),
+      )),
       bottomNavigationBar: BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: Color(0xFF252872),
@@ -421,4 +448,34 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
+}
+
+class BgPainter extends CustomPainter {
+  final Color color;
+
+  const BgPainter({
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint();
+    Path path = Path();
+
+    paint.color = color;
+    path = Path();
+    path.lineTo(size.width, 0);
+    path.cubicTo(size.width, 0, 0, 0, 0, 0);
+    path.cubicTo(0, 0, 0, size.height, 0, size.height);
+    path.cubicTo(size.width * 0.11, size.height * 0.65, size.width * 0.29,
+        size.height * 0.42, size.width / 2, size.height * 0.42);
+    path.cubicTo(size.width * 0.71, size.height * 0.42, size.width * 0.89,
+        size.height * 0.65, size.width, size.height);
+    path.cubicTo(size.width, size.height, size.width, 0, size.width, 0);
+    path.cubicTo(size.width, 0, size.width, 0, size.width, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
