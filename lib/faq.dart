@@ -21,6 +21,7 @@ class _FaqScreenState extends State<FaqScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('FAQs'),
+        backgroundColor: Color(0xFF32A2EA), // Set the appBar color here
       ),
       body: FutureBuilder(
         future: _loadFaqs(),

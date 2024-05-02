@@ -44,12 +44,6 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
   void initState() {
     super.initState();
     _controller.addListener(_onChanged);
-
-    if (widget.school != null) {
-      _expand();
-    } else {
-      _hide();
-    }
   }
 
   void _onChanged() {
@@ -61,7 +55,7 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
 
   void _anchor() => _animateSheet(sheet.snapSizes!.last);
 
-  void _expand() => _animateSheet(sheet.maxChildSize);
+  void _expand() => _animateSheet(sheet.snapSizes![1]);
 
   void _hide() => _animateSheet(sheet.minChildSize);
 
@@ -84,148 +78,83 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context, constraints) => DraggableScrollableSheet(
-              key: _sheet,
-              initialChildSize: 0.5,
-              minChildSize: 0,
-              maxChildSize: 1,
-              expand: true,
-              snap: true,
-              snapSizes: [
-                0,
-                60 / constraints.maxHeight,
-                0.5,
-              ],
-              controller: _controller,
-              builder: (context, scrollController) {
-                return DecoratedBox(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        spreadRadius: 5,
-                        offset: Offset(0, -5))
-                    ]
-                  ),
-                  child: CustomScrollView(
-                    controller: scrollController,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.drag_handle),
-                          ],
-                        ),
-                      ),
-                      if (widget.school != null) SliverToBoxAdapter(
-                        child: Text(
-                          widget.school?.name ?? '',
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ),
-                      // SliverToBoxAdapter(
-                      //   child: ListView(
-                      //     shrinkWrap: true,
-                      //     scrollDirection: Axis.horizontal,
-                      //     children: [
-                            // horizontal grid with 1 picture and 4 picture remaining
-                            // StaggeredGrid.count(
-                            //   axisDirection: AxisDirection.right,
-                            //   crossAxisCount: 4,
-                            //   mainAxisSpacing: 4,
-                            //   crossAxisSpacing: 4,
-                            //   children: [
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 2,
-                            //       mainAxisCellCount: 2,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 2,
-                            //       mainAxisCellCount: 1,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 1,
-                            //       mainAxisCellCount: 1,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 1,
-                            //       mainAxisCellCount: 1,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 4,
-                            //       mainAxisCellCount: 2,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     ),
-                            //     StaggeredGridTile.count(
-                            //       crossAxisCellCount: 4,
-                            //       mainAxisCellCount: 2,
-                            //       child: Container(
-                            //         color: Colors.green,
-                            //       ),
-                            //     )
-                            //   ],
-                            // ),
-                      //       Container(
-                      //         height: 100,
-                      //         width: 100,
-                      //         color: Colors.green,
-                      //         child: Image.asset('images/pin.png'),
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-                      if (widget.school != null) SliverList(
-                        delegate: SliverChildListDelegate([
-                          Container(
-                            height: MediaQuery.of(context).size.height * 0.5,
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 20),
-                                const Text("Offered Programs",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20)),
-                                 widget.school!.offeredPrograms.isNotEmpty
-                                    ? HtmlWidget(
-                                        widget.school!.offeredPrograms,
-                                      )
-                                    : const Text('No programs offered'),
-                              ],
-                            ),
-                          )
-                        ]),
-                      )
+    return LayoutBuilder(builder: (context, constraints) {
+      return DraggableScrollableSheet(
+        key: _sheet,
+        initialChildSize: 0.04,
+        minChildSize: 0.04,
+        maxChildSize: 1,
+        expand: true,
+        snap: true,
+        snapSizes: [
+          0.04,
+          // 60 / constraints.maxHeight,
+          0.5,
+        ],
+        controller: _controller,
+        builder: (context, scrollController) {
+          return DecoratedBox(
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    spreadRadius: 5,
+                    offset: Offset(0, -5))
+                ]),
+            child: CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.drag_handle),
                     ],
                   ),
-                );
-              },
-            ));
+                ),
+                if (widget.school != null)
+                  SliverToBoxAdapter(
+                      child: Text(
+                    widget.school?.name ?? '',
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  )),
+                if (widget.school != null)
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            const Text("Offered Programs",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20)),
+                            widget.school!.offeredPrograms.isNotEmpty
+                                ? HtmlWidget(
+                                    widget.school!.offeredPrograms,
+                                  )
+                                : const Text('No programs offered'),
+                          ],
+                        ),
+                      )
+                    ]),
+                  )
+              ],
+            ),
+          );
+        },
+      );
+    });
   }
 }
 
@@ -240,10 +169,13 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   List<SchoolLocation> schools = [];
 
   final mapController = MapController();
+  final sheet = GlobalKey<_SchoolInformationSheetState>();
 
   static const _startedId = 'AnimatedMapController#MoveStarted';
   static const _inProgressId = 'AnimatedMapController#MoveInProgress';
   static const _finishedId = 'AnimatedMapController#MoveFinished';
+
+  SchoolLocation? selectedSchool;
 
   // https://github.com/fleaflet/flutter_map/blob/f558e43b2611046a533a0bf035bbf86a44c2f3bf/example/lib/pages/animated_map_controller.dart
   void _animatedMapMove(LatLng destLocation, double destZoom,
@@ -309,6 +241,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             zoom: 14,
             onTap: (tapPosition, point) {
               _animatedMapMove(mapController.center, 14);
+              setState(() {
+                selectedSchool = null;
+              });
+              sheet.currentState?._collapse();
             }),
         children: [
           TileLayer(
@@ -332,8 +268,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                         _animatedMapMove(center, 18.0, rotation: 0.0);
 
                         // show bottom sheet
+                        setState(() {
+                          selectedSchool = school;
+                        });
 
-                        _animatedMapMove(loc, 18.0, rotation: 0);
+                        sheet.currentState?._expand();
                       },
                     );
                   },
@@ -351,7 +290,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         ],
       ),
       
-      // SchoolInformationSheet(school: schools.isNotEmpty ? schools.first : null),
+      SchoolInformationSheet(
+        key: sheet,
+        school: selectedSchool),
     ]));
   }
 }

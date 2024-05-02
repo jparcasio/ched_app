@@ -9,6 +9,7 @@ import 'package:chedapplication/map.dart';
 import 'package:pocketbase/pocketbase.dart';
 import 'package:chedapplication/article.dart';
 import 'package:chedapplication/socials.dart';
+import 'package:chedapplication/faq.dart';
 
 class LatestFAQItem extends StatefulWidget {
   const LatestFAQItem();
@@ -74,7 +75,9 @@ class _LatestFAQItemState extends State<LatestFAQItem> {
             SizedBox(height: 1),
             TextButton(
               onPressed: () {
-                // TODO: Handle FAQ button tap
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FaqScreen();
+                }));
               },
               child: const Text(
                 'More FAQs',
@@ -287,7 +290,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: InkWell(
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
-                            return ArticleScreen();
+                            return ArticleScreen(
+                              articleId: 'articleId',
+                            );
                           }));
                         },
                         child: Column(
@@ -318,7 +323,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     viewportFraction: 0.8,
                   ),
                 ),
-
+                Text(
+                  'Featured',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF252872),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                   child: Row(
@@ -345,9 +357,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: PrimaryMenuItem(
                             title: 'Special Orders',
                             subtitle: 'View special orders',
-                            color: Color.fromARGB(255, 239, 204, 78),
+                            color: Color.fromARGB(255, 235, 205, 99),
                             textColor: Colors.black,
-                            child: Image.asset('images/map.jpg', fit: BoxFit.fill),
+                            child: Image.asset('images/so3.png', fit: BoxFit.fill),
                             onTap: () {
                               Navigator.push(context, MaterialPageRoute(builder: (context) {
                                 return MapScreen();
@@ -358,7 +370,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   )),
-
+                Text(
+                  'Other Services',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF252872),
+                  ),
+                ),
                 GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,

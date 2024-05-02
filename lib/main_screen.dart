@@ -1,6 +1,7 @@
 import 'package:chedapplication/faq.dart';
 import 'package:chedapplication/main_menu.dart';
 import 'package:chedapplication/map.dart';
+import 'package:chedapplication/news.dart';
 import 'package:chedapplication/socials.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -36,10 +37,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       icon: Icons.map,
       widget: MapScreen(),
     ),
-    MainScreenItem(
+    const MainScreenItem(
       title: 'News',
       icon: Icons.article,
-      widget: Container(),
+      widget: NewsPage(),
     ),
     MainScreenItem(
       title: 'FAQs',
