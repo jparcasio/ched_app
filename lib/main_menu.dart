@@ -181,13 +181,12 @@ class PrimaryMenuItem extends StatelessWidget {
   }
 }
 
-class MainScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
 
   final List<CarouselItem> carouselItems = [
@@ -250,83 +249,9 @@ class _MainScreenState extends State<MainScreen> {
     ),
   ];
 
-
-  String _selectedOption = '';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      drawer: Drawer(
-      child: Container(
-        color: Color(0xFF32A2EA),
-        child: ListView(
-          children: [
-            DrawerHeader(
-              child: Row(
-                children: [
-                  Icon(
-                    FontAwesomeIcons.facebook,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 20),
-                  Icon(
-                    FontAwesomeIcons.twitter,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 20),
-                  Icon(
-                    FontAwesomeIcons.instagram,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 20),
-                  Icon(
-                    FontAwesomeIcons.youtube,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 20),
-                  Icon(
-                    FontAwesomeIcons.yahoo,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-              
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            for (var i = 0; i < menuItems.length; i++)
-              ListTile(
-                title: Text(
-                  menuItems[i].title,
-                  style: TextStyle(color: Colors.white),
-                ),
-                leading: Icon(
-                  menuItems[i].icon,
-                  color: Color(0xFF252872),
-                ),
-                onTap: () {
-                  if (menuItems[i].onTap != null) {
-                    menuItems[i].onTap!(context);
-                  } else {
-                    // launch the URL
-                  }
-
-                  Navigator.pop(context);
-
-                  if (i == 0) {
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) {
-                        return MapScreen();
-                      }));
-                  }
-                },
-              ),
-          ],
-        ),
-      ),
-    ),
       body: SafeArea(child: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -479,51 +404,6 @@ class _MainScreenState extends State<MainScreen> {
           LatestFAQItem()
         ],
       )),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xFF32A2EA),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article),
-            label: 'News',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.question_answer),
-            label: 'FAQs',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Socials',
-          ),
-        ],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.5),
-        currentIndex: 0,
-        onTap: (idx) {
-          if (idx == 0) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return MainScreen();
-              }));
-            // Check if already in main_menu.dart
-          } else if (idx == 1) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return MapScreen();
-            }));
-          } else if (idx == 4) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return SocialsPage();
-            }));
-          }
-        },
-      ),
     );
   }
 

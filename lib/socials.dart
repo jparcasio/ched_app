@@ -1,8 +1,5 @@
-import 'package:chedapplication/main_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:chedapplication/map.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import './socials.dart';
 
 class Social {
   final IconData icon;
@@ -86,80 +83,6 @@ class SocialsPageState extends State<SocialsPage> {
           );
         },
       ),
-       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Color(0xFF32A2EA),
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.article),
-            label: 'News',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.question_answer),
-            label: 'FAQs',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.group),
-            label: 'Socials',
-          ),
-        ],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.5),
-        currentIndex: 4,
-        onTap: (idx) {
-          if (idx == 0) {
-           Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return MainScreen();
-              }));
-            // Check if already in main_menu.dart        
-          } else if (idx == 1) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return MapScreen();
-            }));
-          } else if (idx == 4) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return SocialsPage();
-            }));
-          }
-        },
-      ),
     );
   }
-}
-class BgPainter extends CustomPainter {
-  final Color color;
-
-  const BgPainter({
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
-    Path path = Path();
-
-    paint.color = color;
-    path = Path();
-    path.lineTo(size.width, 0);
-    path.cubicTo(size.width, 0, 0, 0, 0, 0);
-    path.cubicTo(0, 0, 0, size.height, 0, size.height);
-    path.cubicTo(size.width * 0.11, size.height * 0.65, size.width * 0.29,
-        size.height * 0.42, size.width / 2, size.height * 0.42);
-    path.cubicTo(size.width * 0.71, size.height * 0.42, size.width * 0.89,
-        size.height * 0.65, size.width, size.height);
-    path.cubicTo(size.width, size.height, size.width, 0, size.width, 0);
-    path.cubicTo(size.width, 0, size.width, 0, size.width, 0);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
