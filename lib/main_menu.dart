@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chedapplication/map.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:chedapplication/article.dart';
+import 'package:chedapplication/socials.dart';
 
 class LatestFAQItem extends StatefulWidget {
   const LatestFAQItem();
@@ -95,17 +97,88 @@ class CarouselItem {
 
 class MenuItem {
   final String title;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? widget;
   final String description;
   final String? url;
   final void Function(BuildContext context)? onTap;
 
   const MenuItem(
       {required this.title,
-      required this.icon,
       required this.description,
+      this.icon,
+      this.widget,
       this.url,
       this.onTap});
+}
+
+class PrimaryMenuItem extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final VoidCallback onTap;
+  final Color color;
+  final Color textColor;
+
+  const PrimaryMenuItem({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    required this.onTap,
+    this.color = const Color.fromARGB(255, 41, 181, 255),
+    this.textColor = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        color: color,
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 80),
+              child: SizedBox.fromSize(
+                size: const Size(double.infinity, 200),
+                child: child
+              ),
+            ),
+            Positioned.fill(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {},
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ),
+            )
+          ],
+        )
+      )
+    );
+  }
 }
 
 class MainScreen extends StatefulWidget {
@@ -119,30 +192,20 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<CarouselItem> carouselItems = [
     CarouselItem(
-      title: 'Title 1',
+      title: 'Sample Title 1',
       // long text to test the "see more" feature
-      body: 'Body 1' * 100,
+      body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam sit amet metus vel justo porttitor finibus ac et dui. Maecenas sit amet metus auctor, dictum mauris ac, sodales mi. Cras pretium velit eu nunc lacinia, nec mattis nulla dapibus. Nulla facilisi. Sed sit amet purus velit. Vivamus ut mi nec dui pharetra tincidunt eget vitae libero.',
     ),
     CarouselItem(
-      title: 'Title 2',
-      body: 'Body 2',
+      title: 'Sample Title 2',
+      body: 'Integer non bibendum mi. Fusce vel felis vitae mi dictum tempus non vitae ligula. Nam congue arcu at velit blandit, sit amet vestibulum magna eleifend. Vivamus dictum odio sit amet sapien pulvinar, non consectetur libero faucibus. Ut sit amet feugiat turpis. Phasellus at velit eu odio convallis laoreet.',
     ),
     CarouselItem(
-      title: 'Title 3',
-      body: 'Body 3',
+      title: 'Sample Title 3',
+      body: 'Curabitur nec ipsum vel ipsum congue varius. Nam maximus, justo non posuere consectetur, purus arcu suscipit nunc, nec gravida sem nulla id risus. Proin vel elit a turpis malesuada fermentum. Sed non arcu aliquet, aliquam nulla nec, suscipit leo. Sed tincidunt blandit odio, vitae cursus sem posuere a. Sed quis ligula nec leo ullamcorper ultricies nec id ipsum.',
     ),
   ];
     final List<MenuItem> menuItems = [
-    MenuItem(
-      title: 'Map',
-      icon: Icons.map,
-      description: 'View the map',
-      onTap: (context) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return MapScreen();
-        }));
-      },
-    ),
     MenuItem(
       title: 'Favorites',
       icon: Icons.favorite,
@@ -196,7 +259,7 @@ class _MainScreenState extends State<MainScreen> {
       key: _scaffoldKey,
       drawer: Drawer(
       child: Container(
-        color: Color(0xFF252872),
+        color: Color(0xFF32A2EA),
         child: ListView(
           children: [
             DrawerHeader(
@@ -254,9 +317,9 @@ class _MainScreenState extends State<MainScreen> {
 
                   if (i == 0) {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                          return MapScreen();
-                        }));
+                      MaterialPageRoute(builder: (context) {
+                        return MapScreen();
+                      }));
                   }
                 },
               ),
@@ -278,14 +341,24 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(height: 150),
                 CarouselSlider(
                   items: carouselItems.map(
-                    (item) => Container(
+                    (item) =>Container(
                       height: 100,
                       width: 600,
-                      margin: EdgeInsets.all(5.0),
+                      margin: EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: Color(0xFF252872),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(10.0),
+                        border: Border.all(color: Color(0xFF32A2EA), width: 1.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            spreadRadius: 3,
+                            blurRadius: 7,
+                            offset: Offset(0, 3), 
+                          ),
+                        ],
                       ),
+                        
                       child: InkWell(
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -297,12 +370,12 @@ class _MainScreenState extends State<MainScreen> {
                           children: [
                             Text(
                               item.title,
-                              style: TextStyle(fontSize: 24, color: Colors.white),
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF252872)),
                             ),
                             SizedBox(height: 10),
                             Text(
-                              item.body.substring(0, min(100, item.body.length)) + ( item.body.length > 100 ? '... See more' : '' ),
-                              style: TextStyle(fontSize: 18, color: Colors.white),
+                              item.body.substring(0, min(50, item.body.length)) + ( item.body.length > 50 ? '... See more' : '' ),
+                              style: TextStyle(fontSize: 18, color: Color(0xFF252872)),
                             ),
                           ],
                         ),
@@ -320,6 +393,47 @@ class _MainScreenState extends State<MainScreen> {
                     viewportFraction: 0.8,
                   ),
                 ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                  child: Row(
+                    children: [
+                      // maps
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: PrimaryMenuItem(
+                            title: 'Map',
+                            subtitle: 'View the map',
+                            child: Image.asset('images/map.jpg', fit: BoxFit.fill),
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return MapScreen();
+                              }));
+                            },
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: PrimaryMenuItem(
+                            title: 'Special Orders',
+                            subtitle: 'View special orders',
+                            color: Color.fromARGB(255, 239, 204, 78),
+                            textColor: Colors.black,
+                            child: Image.asset('images/map.jpg', fit: BoxFit.fill),
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return MapScreen();
+                              }));
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+
                 GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -328,34 +442,35 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   itemCount: menuItems.length,
                   itemBuilder: (context, index) {
-                    if (index < menuItems.length) {
-                      return InkWell(
-                        onLongPress: () {
-                          _showIconDetails(context, menuItems[index]);
-                        },
-                        onTap: () {
-                          if (menuItems[index].onTap != null) {
-                            menuItems[index].onTap!(context);
-                          } else {
-                            // launch the URL
-                          }
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(menuItems[index].icon,
-                                size: 70, color: Color(0xFF252872)),
-                            SizedBox(height: 10),
-                            Text(
-                              menuItems[index].title,
-                              style: TextStyle(color: Color(0xFF252872)),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
+                    final menuItem = menuItems[index];
+
+                    return InkWell(
+                      onLongPress: () {
+                        _showIconDetails(context, menuItem);
+                      },
+                      onTap: () {
+                        if (menuItem.onTap != null) {
+                          menuItem.onTap!(context);
+                        } else {
+                          // launch the URL
+                        }
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          menuItem.icon != null 
+                            ? Icon(menuItem.icon,
+                              size: 70, color: Color(0xFF32A2EA)
+                            ) : menuItem.widget != null 
+                            ? menuItem.widget! : Container(),
+                          SizedBox(height: 10),
+                          Text(
+                            menuItem.title,
+                            style: TextStyle(color: Color(0xFF252872)),
+                          ),
+                        ],
+                      ),
+                    );
                   },
                 )
               ],
@@ -365,41 +480,50 @@ class _MainScreenState extends State<MainScreen> {
         ],
       )),
       bottomNavigationBar: BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Color(0xFF252872),
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.map),
-          label: 'Map',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.article),
-          label: 'News',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.question_answer),
-          label: 'FAQs',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.group),
-          label: 'Socials',
-        ),
-      ],
-      selectedItemColor: Colors.white,
-      unselectedItemColor: Colors.white.withOpacity(0.5),
-      currentIndex: 0,
-      onTap: (idx) {
-        if (idx == 1) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return MapScreen();
-          }));
-        }
-      },
-    ),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Color(0xFF32A2EA),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Map',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.article),
+            label: 'News',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.question_answer),
+            label: 'FAQs',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Socials',
+          ),
+        ],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white.withOpacity(0.5),
+        currentIndex: 0,
+        onTap: (idx) {
+          if (idx == 0) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return MainScreen();
+              }));
+            // Check if already in main_menu.dart
+          } else if (idx == 1) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return MapScreen();
+            }));
+          } else if (idx == 4) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return SocialsPage();
+            }));
+          }
+        },
+      ),
     );
   }
 
@@ -418,20 +542,20 @@ class _MainScreenState extends State<MainScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(menuItem.icon, size: 50, color: Color(0xFF252872)),
+                Icon(menuItem.icon, size: 50, color: Color(0xFF32A2EA)),
                 SizedBox(height: 10),
                 Text(
                   menuItem.title,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF252872),
+                    color: Color(0xFF32A2EA),
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
                   menuItem.description,
-                  style: TextStyle(fontSize: 16, color: Color(0xFF252872)),
+                  style: TextStyle(fontSize: 16, color: Color(0xFF32A2EA)),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 20),
