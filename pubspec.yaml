@@ -33,6 +33,10 @@ dependencies:
     sdk: flutter
   carousel_slider: ^4.0.0  
   flutter_icons: ^1.1.0
+  url_launcher: ^6.0.20  # Use the latest version available
+  flip_card: ^0.5.0
+  pdf: ^3.6.0
+  flutter_pdfview: ^1.0.0+14
 
 
   # The following adds the Cupertino Icons font to your application.

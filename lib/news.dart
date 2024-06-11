@@ -15,6 +15,7 @@ class NewsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF32A2EA),
         title: Text('News'),
       ),
       body: FutureBuilder(

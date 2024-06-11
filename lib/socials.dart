@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';  // Import url_launcher package
 
 class Social {
   final IconData icon;
@@ -16,9 +17,13 @@ class SocialsPage extends StatefulWidget {
   SocialsPageState createState() => SocialsPageState();
 }
 
-
 class SocialsPageState extends State<SocialsPage> {
   List<Social> socials = [
+    Social(
+      icon: FontAwesomeIcons.globe,
+      name: 'Official Website',
+      url: 'https://ro11.ched.gov.ph/',
+    ),
     Social(
       icon: Icons.facebook,
       name: 'Facebook',
@@ -27,7 +32,7 @@ class SocialsPageState extends State<SocialsPage> {
     Social(
       icon: FontAwesomeIcons.twitter,
       name: 'Twitter',
-      url: 'https://www.twitter.com',
+      url: 'https://twitter.com/chedroxi',
     ),
     Social(
       icon: FontAwesomeIcons.instagram,
@@ -35,14 +40,9 @@ class SocialsPageState extends State<SocialsPage> {
       url: 'https://www.instagram.com',
     ),
     Social(
-      icon: FontAwesomeIcons.linkedin,
-      name: 'LinkedIn',
-      url: 'https://www.linkedin.com',
-    ),
-    Social(
       icon: FontAwesomeIcons.youtube,
       name: 'YouTube',
-      url: 'https://www.youtube.com',
+      url: 'https://www.youtube.com/c/CHEDRegionalOfficeXI',
     ),
     Social(
       icon: FontAwesomeIcons.yahoo,
@@ -57,10 +57,18 @@ class SocialsPageState extends State<SocialsPage> {
     // Add more socials as needed
   ];
 
+  // Method to launch URLs
+  void _launchURL(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       
       backgroundColor: Colors.white, // Replace with the background color of main_menu.dart
       body: ListView.builder(
         itemCount: socials.length,
@@ -73,12 +81,7 @@ class SocialsPageState extends State<SocialsPage> {
             title: Text(socials[index].name),
             onTap: () {
               // Redirect the user to the social URL
-              // Replace 'redirectFunction' with the appropriate function to redirect the user
-              void redirectFunction(String url) {
-                // Implement the logic to redirect the user to the provided URL
-              }
-
-              redirectFunction(socials[index].url);
+              _launchURL(socials[index].url);
             },
           );
         },

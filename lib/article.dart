@@ -21,6 +21,7 @@ class ArticleScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Article'),
+        backgroundColor: Colors.blue,
       ),
       body: FutureBuilder(
         future: fetchArticle(articleId),

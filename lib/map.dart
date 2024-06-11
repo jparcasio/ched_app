@@ -88,7 +88,6 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
         snap: true,
         snapSizes: [
           0.04,
-          // 60 / constraints.maxHeight,
           0.5,
         ],
         controller: _controller,
@@ -102,10 +101,10 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    spreadRadius: 5,
-                    offset: Offset(0, -5))
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      spreadRadius: 5,
+                      offset: Offset(0, -5))
                 ]),
             child: CustomScrollView(
               controller: scrollController,
@@ -120,16 +119,19 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                 ),
                 if (widget.school != null)
                   SliverToBoxAdapter(
-                      child: Text(
-                    widget.school?.name ?? '',
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                      child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.school?.name ?? '',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
                   )),
                 if (widget.school != null)
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.5,
+                  SliverFillRemaining(
+                    hasScrollBody: true,
+                    child: SingleChildScrollView(
+                      child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +148,8 @@ class _SchoolInformationSheetState extends State<SchoolInformationSheet> {
                                 : const Text('No programs offered'),
                           ],
                         ),
-                      )
-                    ]),
+                      ),
+                    ),
                   )
               ],
             ),
@@ -167,9 +169,11 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   List<SchoolLocation> schools = [];
+  List<SchoolLocation> filteredSchools = [];
 
   final mapController = MapController();
   final sheet = GlobalKey<_SchoolInformationSheetState>();
+  final TextEditingController searchController = TextEditingController();
 
   static const _startedId = 'AnimatedMapController#MoveStarted';
   static const _inProgressId = 'AnimatedMapController#MoveInProgress';
@@ -177,14 +181,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   SchoolLocation? selectedSchool;
 
-  // https://github.com/fleaflet/flutter_map/blob/f558e43b2611046a533a0bf035bbf86a44c2f3bf/example/lib/pages/animated_map_controller.dart
   void _animatedMapMove(LatLng destLocation, double destZoom,
       {double? rotation}) {
-    // use the value from the map controller if the value is not provided
     rotation ??= mapController.rotation;
 
-    // Create some tweens. These serve to split up the transition from one location to another.
-    // In our case, we want to split the transition be<tween> our current map center and the destination.
     final latTween = Tween<double>(
         begin: mapController.center.latitude, end: destLocation.latitude);
     final lngTween = Tween<double>(
@@ -193,11 +193,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     final rotationTween =
         Tween<double>(begin: mapController.rotation, end: rotation);
 
-    // Create a animation controller that has a duration and a TickerProvider.
     final controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
-    // The animation determines what path the animation will take. You can try different Curves values, although I found
-    // fastOutSlowIn to be my favorite.
     final Animation<double> animation =
         CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
@@ -228,71 +225,149 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         schools = results.map(SchoolLocation.fromRecord).toList();
       });
     });
+
+    searchController.addListener(_filterSchools);
+  }
+
+  void _filterSchools() {
+    final query = searchController.text.toLowerCase();
+    if (query.isNotEmpty) {
+      setState(() {
+        filteredSchools = schools.where((school) {
+          final nameMatch = school.name.toLowerCase().contains(query);
+          final programsMatch =
+              school.offeredPrograms.toLowerCase().contains(query);
+          return nameMatch || programsMatch;
+        }).toList();
+      });
+    } else {
+      setState(() {
+        filteredSchools.clear();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    searchController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(children: [
-      FlutterMap(
-        mapController: mapController,
-        options: MapOptions(
-            center: LatLng(7.0699375, 125.59998569691578),
-            zoom: 14,
-            onTap: (tapPosition, point) {
-              _animatedMapMove(mapController.center, 14);
-              setState(() {
-                selectedSchool = null;
-              });
-              sheet.currentState?._collapse();
-            }),
+      body: Stack(
         children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.example.app',
-          ),
-          for (final school in schools)
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: school.location,
-                  width: 40,
-                  height: 40,
-                  builder: (context) {
-                    return GestureDetector(
-                      child: Image.asset('images/pin.png'),
-                      onTap: () async {
-                        final loc = school.location;
-                        final center =
-                            LatLng(loc.latitude - 0.001, loc.longitude);
-                        _animatedMapMove(center, 18.0, rotation: 0.0);
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+                center: LatLng(7.0699375, 125.59998569691578),
+                zoom: 14,
+                onTap: (tapPosition, point) {
+                  _animatedMapMove(mapController.center, 14);
+                  setState(() {
+                    selectedSchool = null;
+                  });
+                  sheet.currentState?._collapse();
+                }),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.app',
+              ),
+              for (final school in schools)
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: school.location,
+                      width: 40,
+                      height: 40,
+                      builder: (context) {
+                        return GestureDetector(
+                          child: Image.asset('images/school_pin.png'),
+                          onTap: () async {
+                            final loc = school.location;
+                            final center =
+                                LatLng(loc.latitude - 0.001, loc.longitude);
+                            _animatedMapMove(center, 18.0, rotation: 0.0);
 
-                        // show bottom sheet
-                        setState(() {
-                          selectedSchool = school;
-                        });
+                            setState(() {
+                              selectedSchool = school;
+                            });
 
-                        sheet.currentState?._expand();
+                            sheet.currentState?._expand();
+                          },
+                        );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search by school name or programs',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+                if (filteredSchools.isNotEmpty)
+                  Container(
+                    height: 200.0, // Fixed height for the dropdown
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: filteredSchools.length,
+                      itemBuilder: (context, index) {
+                        final school = filteredSchools[index];
+                        return ListTile(
+                          title: Text(school.name),
+                          onTap: () {
+                            final loc = school.location;
+                            final center =
+                                LatLng(loc.latitude - 0.001, loc.longitude);
+                            _animatedMapMove(center, 18.0, rotation: 0.0);
+
+                            setState(() {
+                              selectedSchool = school;
+                            });
+
+                            sheet.currentState?._expand();
+                          },
+                        );
+                      },
+                    ),
+                  ),
               ],
             ),
-          // RichAttributionWidget(
-          //   attributions: [
-          //     TextSourceAttribution(
-          //       'OpenStreetMap contributors',
-          //       onTap: () {},
-          //     ),
-          //   ],
-          // ),
+          ),
+          SchoolInformationSheet(
+            key: sheet,
+            school: selectedSchool,
+          ),
         ],
       ),
-      
-      SchoolInformationSheet(
-        key: sheet,
-        school: selectedSchool),
-    ]));
+    );
   }
 }
